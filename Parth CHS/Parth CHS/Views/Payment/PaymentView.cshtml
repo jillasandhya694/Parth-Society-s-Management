@@ -1,0 +1,130 @@
+﻿
+@{
+    ViewBag.Title = "PaymentView";
+}
+
+
+<style>
+
+    th {
+        padding-top: 50px;
+        padding-bottom: 50px;
+        text-align: left;
+        background-color: #55068a;
+        color: white;
+    }
+</style>
+
+
+<script>
+    function GetPaymentViewTable() {
+
+        var jsondata = {
+
+            "Month": $("#monthDDL").val(),
+            "Year": $("#yearDDL").val(),
+        }
+
+        $.ajax({
+            url: "https://localhost:44372/Payment/PaymentViewTable?Month=" + $("#monthDDL").val() + "&Year=" + $("#yearDDL").val(),
+            cache: false,
+            data: jsondata,
+            success: function (data) {
+                $("#Paymenttblbody").empty();
+
+                for (var i = 0; i < data.length; i++) {
+
+                    var BillDate = new Date(parseInt(data[i].BillDate.substr(6)));
+                    var Status = "";
+                    var PaymentDate = "-";
+                    if (data[i].Status == 0) {
+                        Status = "Not Paid";
+                        PaymentDate = "-";
+                    }
+                    else {
+                        Status = "Paid";
+                        PaymentDate = new Date(parseInt(data[i].PaymentDate.substr(6)));
+                    }
+                    $("#Paymenttblbody").append("<tr><td>" + (i + 1) + "</td><td> " + data[i].FirstName + "</td><td>" + data[i].MiddleName + "</td><td>" + data[i].LastName + "</td><td>" + data[i].Month + "</td><td>" + data[i].Year + "</td><td>" + data[i].Amount + "</td><td>" + BillDate + "</td><td>" + Status + "</td><td>" + PaymentDate + "</td></tr > ");
+                    console.log("loop");
+                    //totalamount = totalamount + data[i].Amount;
+                    //totalentries = totalentries + 1;
+
+                }
+            }
+
+        });
+
+    }
+
+
+
+
+
+
+
+
+
+</script>
+
+<h2>Parth Society's Payment Table View</h2>
+
+<h3>Select Month & Year to get the Payment Sheet</h3>
+<br>
+<div style="display: flex;">
+    <div class="col-md-4">
+        <select id="monthDDL" class="form-control">
+            <option value="0">--Month--</option>
+            <option value="1">January</option>
+            <option value="2">February</option>
+            <option value="3">March</option>
+            <option value="4">April</option>
+            <option value="5">May</option>
+            <option value="6">June</option>
+            <option value="7">July</option>
+            <option value="8">August</option>
+            <option value="9">September</option>
+            <option value="10">October</option>
+            <option value="11">November</option>
+            <option value="12">December</option>
+        </select>
+    </div>
+    <br>
+    <br>
+    <div class="col-md-4">
+        <select id="yearDDL" class="form-control">
+            <option value="0">--Year--</option>
+            <option value="2021">2021</option>
+            <option value="2022">2022</option>
+            <option value="2023">2023</option>
+        </select>
+    </div>
+    <br>
+    <br>
+    <div class="col-md-4">
+        <button id="Gobtn" class="btn btn-success btn-lg" onclick="GetPaymentViewTable()">Go</button>
+    </div>
+
+</div>
+<br>
+<br>
+
+<table id="Paymenttbl" class="table table-hover">
+    <thead>
+        <tr>
+            <th scope="col">Sr.no</th>
+            <th scope="col">FirstName</th>
+            <th scope="col">MiddleName</th>
+            <th scope="col">LastName</th>
+            <th scope="col">Month</th>
+            <th scope="col">Year</th>
+            <th scope="col">Amount</th>
+            <th scope="col">BillDate</th>
+            <th scope="col">Status</th>
+            <th scope="col">PaymentDate</th>
+        </tr>
+    </thead>
+    <tbody id="Paymenttblbody">
+    </tbody>
+
+</table>

@@ -1,0 +1,574 @@
+﻿@{
+    ViewBag.Title = "Index";
+}
+<br>
+<h2>Parth Co-Operate Housing Society </h2>
+<br>
+<br>
+<style>
+
+    th {
+        padding-top: 50px;
+        padding-bottom: 50px;
+        text-align: left;
+        background-color: #55068a;
+        color: white;
+    }
+</style>
+
+
+
+<script>
+
+    function StatusCall(Id) {
+      var IsActive = $('#statusckh_' + Id).prop("checked");
+
+        $.ajax({
+            url: "https://localhost:44372/Home/UpdateUserAccess?userId= " + Id + "&IsActive=" + IsActive,
+            cache: false,
+            success: function () {
+                alert("Updated successfully");
+            },
+            error: function (errmessage) {
+                console.log(errmessage);
+            }
+
+        });
+
+    }
+
+    function ClearAdd() {
+        $("#firstNametxt").val("");
+        $("#middleNametxt").val("");
+        $("#lastNametxt").val("");
+        $("#phoneNotxt").val("");
+        $("#adharNotxt").val("");
+        $("#emailIdtxt").val("");
+        $("#societyMembersDDL").val("");
+        $("#roomDDL").val("");
+        $("#floorNotxt").val("");
+        $("#typeOfRoomtxt").val("");
+        $("#areaOfRoomtxt").val("");
+
+
+    }
+
+    function AddUserDetails() {
+
+        var jsondata = {
+
+            "FirstName": $("#firstNametxt").val(),
+            "MiddleName": $("#middleNametxt").val(),
+            "LastName": $("#lastNametxt").val(),
+            "PhoneNo": $("#phoneNotxt").val(),
+            "AdharNo": $("#adharNotxt").val(),
+            "EmailId": $("#emailIdtxt").val(),
+            "DesignationId": $("#societyMembersDDL").val(),
+            "RoomsId": $("#roomDDL").val(),
+
+
+        }
+
+        $.ajax({
+            url: "https://localhost:44372/Home/SaveUserDetails",
+            cache: false,
+            data: jsondata,
+            success: function (data) {
+                alert("Successfully Saved User Details");
+                $('#myModal').modal('hide');
+                window.location.reload();
+            },
+            error: function (errmessage) {
+                console.log(errmessage);
+            }
+
+        });
+
+    }
+
+
+    function SaveEditDetails() {
+
+        var jsondata = {
+            "Id": $("#Idtxt").val(),
+            "FirstName": $("#firstNametxt").val(),
+            "MiddleName": $("#middleNametxt").val(),
+            "LastName": $("#lastNametxt").val(),
+            "PhoneNo": $("#phoneNotxt").val(),
+            "AdharNo": $("#adharNotxt").val(),
+            "EmailId": $("#emailIdtxt").val(),
+            "DesignationId": $("#societyMembersDDL").val(),
+            "RoomsId": $("#roomDDL").val(),
+
+
+        }
+
+        $.ajax({
+            url: "https://localhost:44372/Home/SaveEditedDetails",
+            cache: false,
+            data: jsondata,
+            success: function (data) {
+                alert("Successfully Updated");
+                $('#myModal').modal('hide');
+                window.location.reload();
+            },
+            error: function (errmessage) {
+                console.log(errmessage);
+            }
+
+        });
+
+    }
+
+
+    var RoomsList = [];
+    function editRoomDropDownList(data) {
+        RoomsList = data;
+        for (var i = 0; i < data.length; i++) {
+            $('#roomDDL')
+                .append($("<option></option>")
+                    .attr("value", data[i].RoomsId)
+                    .text(data[i].RoomNo));
+        }
+    }
+
+
+
+    function getRooms(a) {
+        $.ajax({
+            url: "https://localhost:44372/Home/GetAllRooms",
+            cache: false,
+            success: a,
+            error: function (errmessage) {
+                console.log(errmessage);
+            }
+
+        });
+    }
+
+
+    function getDesignation() {
+        $.ajax({
+            url: "https://localhost:44372/Home/GetDesignations",
+            cache: false,
+            success: function (data) {
+
+                for (var i = 0; i < data.length; i++) {
+                    $('#societyMembersDDL')
+                        .append($("<option></option>")
+                            .attr("value", data[i].Id)
+                            .text(data[i].SocietyMembers));
+                }
+            },
+            error: function (errmessage) {
+                console.log(errmessage);
+            }
+
+        });
+    }
+
+    function getStates() {
+        $.ajax({
+            url: "https://localhost:44372/Home/GetStates",
+            cache: false,
+            success: function (data) {
+
+                for (var i = 0; i < data.length; i++) {
+                    $('#StateDDL')
+                        .append($("<option></option>")
+                            .attr("value", data[i].StateId)
+                            .text(data[i].State_));
+                }
+            },
+            error: function (errmessage) {
+                console.log(errmessage);
+            }
+
+        });
+    }
+
+    function getDistrict() {
+        $.ajax({
+            url: "https://localhost:44372/Home/GetDistricts?StateId=" + $("#StateDDL").val(),
+            cache: false,
+            success: function (data) {
+                $('#DistrictDDL').empty();
+                $('#DistrictDDL')
+                    .append($("<option></option>")
+                        .attr("value", 0)
+                        .text('--Select--'));
+                for (var i = 0; i < data.length; i++) {
+
+                    $('#DistrictDDL')
+                        .append($("<option></option>")
+                            .attr("value", data[i].DistrictId)
+                            .text(data[i].District_));
+                }
+            },
+            error: function (errmessage) {
+                console.log(errmessage);
+            }
+
+        });
+    }
+
+    function getCity() {
+        $.ajax({
+            url: "https://localhost:44372/Home/GetCity?DistrictId=" + $("#DistrictDDL").val(),
+            cache: false,
+            success: function (data) {
+                $('#CityDDL').empty();
+                $('#CityDDL')
+                    .append($("<option></option>")
+                        .attr("value", 0)
+                        .text('--Select--'));
+                for (var i = 0; i < data.length; i++) {
+
+                    $('#CityDDL')
+                        .append($("<option></option>")
+                            .attr("value", data[i].CityId)
+                            .text(data[i].City_));
+                }
+            },
+            error: function (errmessage) {
+                console.log(errmessage);
+            }
+
+        });
+    }
+
+    function Editpopup(Id) {
+
+        // ajax of GetUserDetailsById
+        $.ajax({
+
+            url: "https://localhost:44372/Home/GetUserDetailsById?userId= " + Id,
+            cache: false,
+            success: function (data) {
+
+                $("#Idtxt").val(Id);
+                $("#firstNametxt").val(data.FirstName);
+                $("#middleNametxt").val(data.MiddleName);
+                $("#lastNametxt").val(data.LastName);
+                $("#phoneNotxt").val(data.PhoneNo);
+                $("#adharNotxt").val(data.AdharNo);
+                $("#emailIdtxt").val(data.EmailId);
+                $("#societyMembersDDL").val(data.DesignationId);
+                $("#roomDDL").val(data.RoomsId);
+                $("#floorNotxt").val(data.FloorNo);
+                $("#typeOfRoomtxt").val(data.TypeOfRoom);
+                $("#areaOfRoomtxt").val(data.AreaOfRoom);
+                console.log(data);
+                //success logic
+                // To fill the data in Popup
+
+            },
+            error: function (errmessage) {
+                console.log(errmessage);
+            }
+
+        });
+        $("#editsavebtn").show();
+        $("#userdeatilssavebtn").hide();
+
+        $('#myModal').modal('show');
+
+    }
+
+    function SetCheckbox()
+    {
+        var dataList = @Html.Raw(Json.Encode(Model));
+      //  console.log(tags);
+        for (var i = 0; i < dataList.length; i++)
+         {
+            var IsActive = dataList[i].Isactive;
+            var Id = dataList[i].Id;
+
+            var chkId = '#chkCell_' + Id;
+            if (IsActive) {
+                var htmlData = '<input type="checkbox" data-toggle="switchbutton" data-onstyle="success" data-offstyle="danger" onchange="StatusCall(' + Id + ')" id="statusckh_' + Id + '" checked>'
+                $(chkId).append(htmlData);
+            }
+            else {
+                var htmlData = '<input type="checkbox" data-toggle="switchbutton" data-onstyle="success" data-offstyle="danger" onchange="StatusCall(' + Id + ')" id="statusckh_' + Id + '">'
+
+                $(chkId).append(htmlData);
+            }
+
+         }
+    }
+
+    $(document).ready(function () {
+        SetCheckbox();
+        getRooms(editRoomDropDownList);
+        getDesignation();
+        getStates();
+      
+       
+
+;        $("#roomDDL").change(function () {
+            var roomDetails = $(RoomsList).filter(function (idx) {
+                return RoomsList[idx].RoomsId == $("#roomDDL").val();
+            });
+
+            $("#floorNotxt").val(roomDetails[0].FloorNo);
+            $("#typeOfRoomtxt").val(roomDetails[0].TypeOfRoom);
+            $("#areaOfRoomtxt").val(roomDetails[0].AreaOfRoom);
+
+        });
+
+        $("#StateDDL").change(function () {
+            getDistrict();
+
+        });
+
+        $("#DistrictDDL").change(function () {
+           
+            getCity();
+        });
+
+
+        $("#adduserbtn").click(function () {
+
+            $("#editsavebtn").hide();
+            $("#userdeatilssavebtn").show();
+            $('#myModal').modal('show');
+
+
+        });
+
+    });
+</script>
+
+Hi @Session["Username"], Welcome to our society dashboard!!
+<br>
+<br>
+<br>
+<button id="adduserbtn" type="button" class="btn btn-success" onclick="ClearAdd()">Add <span class="glyphicon glyphicon-user"></span><span class="glyphicon glyphicon-plus"></span></button>
+
+<br>
+<br>
+
+<table class="table table-hover">
+
+    <tr>
+        <th scope="col">FirstName</th>
+        <th scope="col">MiddleName</th>
+        <th scope="col">LastName</th>
+        <th scope="col">PhoneNo</th>
+        <th scope="col">AdharNo</th>
+        <th scope="col">EmailId</th>
+        <th scope="col">SocietyMembers</th>
+        <th scope="col">RoomNo</th>
+        <th scope="col">FloorNo</th>
+        <th scope="col">TypeOfRoom</th>
+        <th scope="col">AreaOfRoom</th>
+        <th scope="col">Action</th>
+        <th scope="col">Status</th>
+    </tr>
+
+    @foreach (var row in Model)
+    {
+        <tr>
+            <td>@row.FirstName</td>
+            <td>@row.MiddleName</td>
+            <td>@row.LastName</td>
+            <td>@row.PhoneNo</td>
+            <td>@row.AdharNo</td>
+            <td>@row.EmailId</td>
+            <td>@row.SocietyMembers</td>
+            <td>@row.RoomNo</td>
+            <td>@row.FloorNo</td>
+            <td>@row.TypeOfRoom</td>
+            <td>@row.AreaOfRoom</td>
+            <td>
+                <a href="#" class="btn btn-outline-success btn-lg" onclick="Editpopup(@row.Id)">
+                    <span class="glyphicon glyphicon-pencil"></span>
+                </a>
+            </td>
+
+            <td id="chkCell_@row.Id">
+                @*@Html.CheckBox("IsActive", (bool)row.Isactive, new { @onchange = "StatusCall(@row.Id)", @id = "statusckh_@row.Id" ,@data - toggle = "switchbutton"  data - onstyle = "success" data - offstyle = "danger"  })*@
+                @*<input type="checkbox" data-toggle="switchbutton" data-onstyle="success" data-offstyle="danger" onchange="StatusCall(@row.Id)" id="statusckh_@row.Id">*@
+            </td>
+
+
+        </tr>
+
+    }
+
+
+</table>
+
+<div class="modal fade" id="myModal" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">×</button>
+                <h4 class="modal-title">Edit information</h4>
+            </div>
+            <div class="modal-body">
+
+
+                <form class="row g-3">
+                    <div class="col-md-4">
+                        <label for="firstNametxt" class="form-label">First name</label>
+                        <input type="text" class="form-control is-valid" id="firstNametxt" value="" required>
+                        <input type="text" id="Idtxt" hidden>
+                        <div class="valid-feedback">
+
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="middleNametxt" class="form-label">Middle name</label>
+                        <input type="text" class="form-control is-valid" id="middleNametxt" value="" required>
+                        <div class="valid-feedback">
+
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="lastNametxt" class="form-label">Last name</label>
+                        <div class="input-group has-validation">
+
+                            <input type="text" class="form-control is-invalid" id="lastNametxt" value="" aria-describedby="inputGroupPrepend3 validationServerUsernameFeedback" required>
+                            <div id="validationServerUsernameFeedback" class="invalid-feedback">
+
+                            </div>
+                        </div>
+                    </div>
+
+
+
+
+
+
+                    <div class="col-md-4">
+                        <label for="phoneNotxt" class="form-label">PhoneNo</label>
+                        <input type="number" class="form-control is-valid" id="phoneNotxt" value="" required>
+                        <div class="valid-feedback">
+
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="adharNotxt" class="form-label">AdharNo</label>
+                        <input type="number" class="form-control is-valid" id="adharNotxt" value="" required>
+                        <div class="valid-feedback">
+
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="emailIdtxt" class="form-label">EmailId</label>
+                        <div class="input-group has-validation">
+
+                            <input type="text" class="form-control is-invalid" id="emailIdtxt" value="" aria-describedby="inputGroupPrepend3 validationServerUsernameFeedback" required>
+                            <div id="validationServerUsernameFeedback" class="invalid-feedback">
+
+                            </div>
+                        </div>
+                    </div>
+
+
+
+
+
+
+                    <div class="col-md-4">
+                        <label for="societyMemberstxt" class="form-label">SocietyMembers</label>
+
+                        <select id="societyMembersDDL" class="form-control">
+                            <option value="0">--Select--</option>
+                        </select>
+                        @*<input type="text" class="form-control is-valid" id="societyMemberstxt" value="" required>*@
+                        <div class="valid-feedback">
+
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="roomNottxt" class="form-label">RoomNo</label>
+                        <select id="roomDDL" class="form-control">
+                            <option value="0">--Select--</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="validationServer09" class="form-label">FloorNo</label>
+                        <div class="input-group has-validation">
+
+                            <input type="number" class="form-control is-invalid" id="floorNotxt" value="" aria-describedby="inputGroupPrepend3 validationServerUsernameFeedback" disabled>
+                            <div id="validationServerUsernameFeedback" class="invalid-feedback">
+
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                    <div class="col-md-4">
+                        <label for="validationServer10" class="form-label">TypeOfRoom</label>
+                        <input type="text" class="form-control is-valid" id="typeOfRoomtxt" value="" disabled>
+                        <div class="valid-feedback">
+
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="validationServer11" class="form-label">AreaOfRoom</label>
+                        <input type="number" class="form-control is-valid" id="areaOfRoomtxt" value="" disabled>
+                        <div class="valid-feedback">
+
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="Statetxt" class="form-label">State</label>
+                        <select id="StateDDL" class="form-control">
+                            <option value="0">--Select--</option>
+                        </select>
+                        <div class="valid-feedback">
+
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="Districtttxt" class="form-label">District</label>
+                        <select id="DistrictDDL" class="form-control">
+                            <option value="0">--Select--</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="Citytxt" class="form-label">City</label>
+                        <select id="CityDDL" class="form-control">
+                            <option value="0">--Select--</option>
+                        </select>
+                        <div class="input-group has-validation">
+
+
+                        </div>
+                    </div>
+
+
+
+
+
+
+
+            <div class="modal-footer">
+                <div class="col-12">
+                    <button id="editsavebtn" class="btn btn-primary" onclick="SaveEditDetails()" type="submit">Submit form</button>
+                    <button id="userdeatilssavebtn" class="btn btn-primary" onclick="AddUserDetails()" type="submit">Save</button>
+                </div>
+            </div>
+
+
+
+
+            </form>
+
+
+
+
+
+        </div>
+    </div>
+</div>
+
+Logged in with this account : @Session["UserName"]
+<br>
+Last LoggedIn Time : @Session["LoggedInTime"]

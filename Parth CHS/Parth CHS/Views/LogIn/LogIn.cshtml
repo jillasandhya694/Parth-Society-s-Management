@@ -1,0 +1,61 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+
+@{
+    Layout = "~/Views/Shared/_LogInLayout.cshtml";
+}
+
+
+<br>
+
+
+<style>
+    input[type=text] {
+        width: 100%;
+        padding: 12px 20px;
+        margin: 8px 0;
+        box-sizing: border-box;
+        border: 2px solid red;
+        border-radius: 4px;
+    }
+
+    input[type=password] {
+        width: 100%;
+        padding: 12px 20px;
+        margin: 8px 0;
+        box-sizing: border-box;
+        border: 2px solid red;
+        border-radius: 4px;
+    }
+</style>
+
+
+<script>
+    function VerifyUser() {
+      
+        var url = "https://localhost:44372/LogIn/CheckLogin?Username=" + $("#urnameid").val() + "&Password=" + $("#passwrid").val();
+        window.location.href = url;
+    }
+
+</script>
+
+
+
+<h2>Login Here</h2>
+<br>
+<br>
+<label>UserName:</label>
+<input type="text" id="urnameid">
+<br>
+<br>
+<label>Password:</label>
+<input type="password" id="passwrid">
+<br>
+<br>
+<br>
+<br>
+
+<button id="loginbtn" class="btn btn-success" onclick="VerifyUser()">Login</button>
+

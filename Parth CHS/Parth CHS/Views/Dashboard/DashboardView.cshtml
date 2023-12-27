@@ -1,0 +1,212 @@
+﻿
+@{
+    ViewBag.Title = "DashboardView";
+}
+
+<style>
+
+    th {
+        padding-top: 50px;
+        padding-bottom: 50px;
+        text-align: left;
+        background-color: #55068a;
+        color: white;
+    }
+</style>
+
+<script>
+
+    function Viewpopup(Month, Year, Id, Status) {
+        $("#Idtxt").val(Id);
+        if (Status == 1) {
+            $('#paymentbtn').hide();
+        }
+        else {
+            $('#paymentbtn').show();
+        }
+            $('#myModal').modal('show');
+
+            $.ajax({
+                url: "https://localhost:44372/Maintenance/CheckMonthYear?Month=" + Month + "&Year=" + Year,
+                cache: false,
+                
+                success: function (data) {
+                    
+                    $("#maintenancetblbody").empty();
+
+                    var totalentries = 0;
+                    var totalamount = 0
+                    for (var i = 0; i < data.length; i++) {
+                        var date = new Date(parseInt(data[i].Entrydate.substr(6)));
+                        $("#maintenancetblbody").append("<tr><td>" + (i + 1) + "</td><td>" + data[i].Decribe + "</td><td>" + date + "</td><td>" + data[i].Amount + "</td></tr>");
+                        console.log("loop");
+                        totalamount = totalamount + data[i].Amount;
+                        totalentries = totalentries + 1;
+
+                    }
+                    $("#totallbl").val(totalamount);
+                    $("#totalentrylbl").val(totalentries);
+                },
+
+                error: function (errmessage) {
+                    console.log(errmessage);
+                }
+
+            });
+        }
+  
+
+
+    function GetUserPaymentViewTable() {
+
+        var jsondata = {
+            "Year": $("#yearDDL").val()
+        }
+
+        $.ajax({
+            url: "https://localhost:44372/Dashboard/DashboardPaymentView?Year=" + $("#yearDDL").val(),
+            cache: false,
+            data: jsondata,
+            success: function (data) {
+
+                $("#UserPaymenttblbody").empty();
+
+                for (var i = 0; i < data.length; i++) {
+                    var BillDate = new Date(parseInt(data[i].BillDate.substr(6)));
+                    var Status = "";
+                    var PaymentDate = "-";
+                    if (data[i].Status == 0) {
+                        Status = "Not paid";
+                        PaymentDate = "-"
+                    }
+                    else {
+                        Status = "Paid";
+                        var PaymentDate = new Date(parseInt(data[i].PaymentDate.substr(6)));
+                    }
+
+                    $("#UserPaymenttblbody").append("<tr><td>" + (i + 1) + "</td><td> " + data[i].FirstName + "</td><td>" + data[i].MiddleName + "</td><td>" + data[i].LastName + "</td><td>" + data[i].Month + "</td><td>" + data[i].Year + "</td><td>" + data[i].Amount + "</td><td>" + BillDate + "</td><td>" + Status + "</td><td>" + PaymentDate + "</td>"
+                        //+ '<td><a href="#"class="btn btn-outline-danger"" onclick="Viewpopup(' + data[i].Month + ' , ' + data[i].Year + ')"><span class="glyphicon glyphicon-list"></span></a></td>'
+                        + '<td><a href="#"class="btn btn-outline-danger"" onclick="Viewpopup(' + data[i].Month + ' , ' + data[i].Year + ', ' + data[i].Id + ', ' + data[i].Status + ' )"><span class="glyphicon glyphicon-qrcode"></span></a></td> </tr > ');
+
+                    console.log("loop");
+                }
+            }
+
+        });
+
+    }
+
+    function PaymentDone()
+    {
+        $("#Idtxt").val();
+
+        $.ajax({
+            url: "https://localhost:44372/Dashboard/UpdatePayment?Id=" + $("#Idtxt").val(),
+            cache: false,
+            success: function () {
+
+                alert("Payment Done Successfully");
+            }
+
+        });
+    }
+</script>
+
+
+<h2>User's Payment Table View</h2>
+<br>
+<br>
+
+<h3>Hi @Session["Username"], Welcome to our society dashboard!!</h3>
+<h3>Select Month & Year to get the Payment Sheet</h3>
+<br>
+<div style="display: flex;">
+    <div class="col-md-4">
+        <select id="yearDDL" class="form-control">
+            <option value="0">--Year--</option>
+            <option value="2021">2021</option>
+            <option value="2022">2022</option>
+            <option value="2023">2023</option>
+        </select>
+    </div>
+    <br>
+    <br>
+    <div class="col-md-4">
+        <button id="Gobtn" class="btn btn-danger btn-sm" onclick="GetUserPaymentViewTable()">Go</button>
+    </div>
+
+</div>
+<br>
+<br>
+
+<table id="UserPaymenttbl" class="table table-hover">
+    <thead>
+        <tr>
+            <th scope="col">Sr.no</th>
+            <th scope="col">FirstName</th>
+            <th scope="col">MiddleName</th>
+            <th scope="col">LastName</th>
+            <th scope="col">Month</th>
+            <th scope="col">Year</th>
+            <th scope="col">Amount</th>
+            <th scope="col">BillDate</th>
+            <th scope="col">Status</th>
+            <th scope="col">PaymentDate</th>
+            @*<th scope="col">Action</th>*@
+            <th scope="col">Pay</th>
+
+
+        </tr>
+    </thead>
+    <tbody id="UserPaymenttblbody">
+    </tbody>
+
+</table>
+
+<div class="modal fade" id="myModal" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">×</button>
+                <h4 class="modal-title">Parth Society's Maintenance Table</h4>
+            </div>
+            <input type="text" id="Idtxt" hidden>
+            <div class="modal-body">
+
+                <table id="maintenancetbl" class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th scope="col">Sr.No</th>
+                            <th scope="col">Decribe</th>
+                            <th scope="col">Entrydate</th>
+                            <th scope="col">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody id="maintenancetblbody">
+                    </tbody>
+
+                </table>
+
+                <div class="modal-footer">
+
+                    <div>
+                        <label>Total Amount:</label>
+                        <input type="number" id="totallbl" value="0" disabled></input>
+                    </div>
+                    <br>
+                    <div>
+                        <label>Total Entries:</label>
+                        <input type="number" id="totalentrylbl" value="0" disabled></input>
+                    </div>
+                    <br>
+                    <div>
+                        <button type="button" id="paymentbtn"class="btn btn-warning" onclick="PaymentDone()">Payment</button>
+                    </div>
+
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>

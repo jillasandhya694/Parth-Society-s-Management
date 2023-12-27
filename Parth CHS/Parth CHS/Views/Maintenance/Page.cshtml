@@ -1,0 +1,372 @@
+﻿
+@{
+    ViewBag.Title = "Page";
+}
+
+
+<style>
+
+    th {
+        padding-top: 50px;
+        padding-bottom: 50px;
+        text-align: left;
+        background-color: #55068a;
+        color: white;
+    }
+</style>
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+
+<script>
+
+    function validation() {
+        if ($("#describetxt").val() == "") {
+            return false;
+        }
+        else if ($("#entrydatetxt").val() == "") {
+            return false;
+        }
+        else if ($("#amounttxt").val() == "") {
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
+
+    function GetMaintenance() {
+
+
+        $.ajax({
+            url: "https://localhost:44372/Maintenance/CheckMonthYear?Month=" + $("#monthDDL").val() + "&Year=" + $("#yearDDL").val(),
+            cache: false,
+           
+            success: function (data) {
+               
+                $("#maintenancetblbody").empty();
+             
+                var totalentries = 0;
+                var totalamount = 0;
+                for (var i = 0; i < data.length; i++) {
+                    var date = new Date(parseInt(data[i].Entrydate.substr(6)));
+                    $("#maintenancetblbody").append("<tr><td>" + (i + 1) + "</td><td>" + data[i].Decribe + "</td><td>" + date + "</td><td>" + data[i].Amount + "</td></tr>");
+                    console.log("loop");
+                    totalamount = totalamount + data[i].Amount;
+                    totalentries = totalentries + 1;
+                        
+                }
+                $("#totallbl").val(totalamount);
+                $("#totalentrylbl").val(totalentries);
+            },
+
+            error: function (errmessage) {
+                console.log(errmessage);
+            }
+
+        });
+    }
+
+    function SaveRecord() {
+
+        if (validation() == true) {
+
+            var jsondata = {
+                "Decribe": $("#describetxt").val(),
+                "Entrydate": $("#entrydatetxt").val(),
+                "Amount": $("#amounttxt").val(),
+            }
+
+            $.ajax({
+                url: "https://localhost:44372/Maintenance/SaveMaintenanceDetails",
+                cache: false,
+                data: jsondata,
+                success: function (data) {
+                    if (data == true) {
+                        alert("Successfully Saved Record!");
+                    }
+                    else {
+                        alert("This month maintenace is already generated");
+                    }
+                },
+                error: function (errmessage) {
+                    console.log(errmessage);
+
+                }
+
+
+            });
+
+
+        }
+
+    }
+
+    function generatepopup() {
+
+        $('#myModal2').modal('show');
+    }
+
+    function validationGMain() {
+        if ($("#monthDDL2").val == "") {
+            return false;
+        }
+
+        else if ($("#yearDDL2").val == "") {
+            return false;
+        }
+
+        else {
+            return true;
+        }
+    }
+
+    function generatemainrecord() {
+       
+        if (validationGMain() ==true) {
+            var jsondata= {
+                "Month": $("#monthDDL2").val(),
+                "Year": $("#yearDDL2").val()
+
+            }
+
+            $.ajax({
+                url: "https://localhost:44372/Maintenance/SaveGMsumRecord?Month=" + $("#monthDDL2").val() + "&Year=" + $("#yearDDL2").val(),
+                cache: false,
+                data: jsondata,
+                success: function (data) {
+                    if (data == true) {
+                        alert("successfully saved!");
+                    }
+                    else {
+                        alert("Cannot insert already saved!");
+                    }
+                },
+
+                error: function (errmessage) {
+                    console.log(errmessage);
+
+                },
+
+
+
+            });
+
+
+
+        }
+
+    }
+
+    $(document).ready(function () {
+        $("#Addbtn").click(function () {
+            $('#myModal').modal('show');
+
+        });
+    });
+
+
+</script>
+
+<h2>Manage Maintenance</h2>
+
+<br>
+<br>
+
+    <h3>Select Month & Year to get the Maintenance Sheet</h3>
+    <br>
+    <br>
+    <br>
+    <div style="display: flex;">
+            <div class="col-md-4">
+                <select id="monthDDL" class="form-control">
+                    <option value="0">--Month--</option>
+                    <option value="1">January</option>
+                    <option value="2">February</option>
+                    <option value="3">March</option>
+                    <option value="4">April</option>
+                    <option value="5">May</option>
+                    <option value="6">June</option>
+                    <option value="7">July</option>
+                    <option value="8">August</option>
+                    <option value="9">September</option>
+                    <option value="10">October</option>
+                    <option value="11">November</option>
+                    <option value="12">December</option>
+                </select>
+            </div>
+            <br>
+            <br>
+            <div class="col-md-4">
+                <select id="yearDDL" class="form-control">
+                    <option value="0">--Year--</option>
+                    <option value="2021">2021</option>
+                    <option value="2022">2022</option>
+                    <option value="2023">2023</option>
+                </select>
+            </div>
+            <br>
+            <br>
+            <div class="col-md-4">
+                <button id="Gobtn" class="btn btn-danger btn-lg" onclick="GetMaintenance()">Go</button>
+            </div>
+      
+    </div>
+
+        <br>
+        <br>
+        <br>
+        <table id="maintenancetbl" class="table table-hover">
+            <thead>
+                <tr>
+                    <th scope="col">Sr.No</th>
+                    <th scope="col">Decribe</th>
+                    <th scope="col">Entrydate</th>
+                    <th scope="col">Amount</th>
+                </tr>
+            </thead>
+            <tbody id="maintenancetblbody">
+            </tbody>
+
+        </table>
+
+        <div>
+            <label>Total Amount:</label>
+            <input type="number" id="totallbl" value="0" disabled></input>
+        </div>
+        <br>
+        <div>
+            <label>Total Entries:</label>
+            <input type="number" id="totalentrylbl" value="0" disabled></input>
+        </div>
+
+        <br>
+        <hr>
+        <button id="Addbtn" class="btn btn-success btn-lg">Add Record</button>
+
+        <hr>
+
+        <button id="generatebtn" class="btn btn-warning btn-lg" onclick="generatepopup()">Generate Maintenance</button>
+
+
+@*save record*@
+        <div class="w3-container">
+
+            <div class="modal fade" id="myModal" role="dialog">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">×</button>
+                            <h4 class="modal-title">Add Record</h4>
+                        </div>
+                        <div class="modal-body">
+
+
+                            <form class="row g-3">
+                                <div class="col-md-4">
+                                    <label for="describetxt" class="form-label">Decribe:</label>
+                                    <input type="text" class="form-control is-valid" id="describetxt" value="" required>
+
+                                    <div class="valid-feedback">
+
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="entrydatetxt" class="form-label">Entrydate:</label>
+                                    <input type="date" class="form-control is-valid" id="entrydatetxt" value="" required>
+                                    <div class="valid-feedback">
+
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="amounttxt" class="form-label">Amount:</label>
+                                    <div class="input-group has-validation">
+
+                                        <input type="number" class="form-control is-invalid" id="amounttxt" value="" aria-describedby="inputGroupPrepend3 validationServerUsernameFeedback" required>
+                                        <div id="validationServerUsernameFeedback" class="invalid-feedback">
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <br>
+                                <br>
+                                <br>
+
+                                <div class="modal-footer">
+                                    <div class="col-12">
+
+                                        <button id="userdeatilssavebtn" class="btn btn-success btn-sm" onclick="SaveRecord()" type="submit">Save</button>
+                                    </div>
+                                </div>
+
+
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+@*gererate maintenance record*@
+        <div class="w3-container">
+            <div class="modal fade" id="myModal2" role="dialog">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">×</button>
+                            <h4 class="modal-title">Select Month & Year</h4>
+                        </div>
+
+                        <div class="modal-body">
+
+
+                            <form class="row g-3">
+                                <div class="col-md-4">
+                                    <select id="monthDDL2" class="form-control">
+                                        <option value="0">--Select Month--</option>
+                                        <option value="1">January</option>
+                                        <option value="2">February</option>
+                                        <option value="3">March</option>
+                                        <option value="4">April</option>
+                                        <option value="5">May</option>
+                                        <option value="6">June</option>
+                                        <option value="7">July</option>
+                                        <option value="8">August</option>
+                                        <option value="9">September</option>
+                                        <option value="10">October</option>
+                                        <option value="11">November</option>
+                                        <option value="12">December</option>
+                                    </select>
+                                </div>
+
+
+                                <div class="col-md-4">
+
+                                    <select id="yearDDL2" class="form-control">
+                                        <option value="0">--Select Year--</option>
+                                        <option value="2021">2021</option>
+                                        <option value="2022">2022</option>
+                                        <option value="2023">2023</option>
+                                    </select>
+                                </div>
+
+
+
+                                <div class="col-4">
+                                    <button id="Genemaintenancebtn" class="btn btn-danger btn-sm" onclick="generatemainrecord()" type="submit">Go</button>
+                                </div>
+
+                            </form>
+                        </div>
+
+
+
+
+                    </div>
+                </div>
+            </div>
+
+
+        </div>

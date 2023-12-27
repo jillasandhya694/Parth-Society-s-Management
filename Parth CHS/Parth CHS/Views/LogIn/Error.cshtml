@@ -1,0 +1,26 @@
+﻿
+@{
+    ViewBag.Title = "Error";
+}
+
+@{
+    Layout = "~/Views/Shared/_LogInLayout.cshtml";
+}
+
+<h2>Not Found</h2>
+<br><br><br><br>
+
+<script>
+
+    function redirect()
+    {
+        var url = "https://localhost:44372";
+        window.location.href = url;
+    }
+
+    </script>
+
+<button type="button" onclick="redirect()" class="btn btn-danger">Go To Login Page</button>
+
+
+
